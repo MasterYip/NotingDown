@@ -27,7 +27,7 @@ system_hotkey==1.0.3
 
 1. Clone the repository
 ```bash
-git clone https://github.com/<username>/<repository>.git
+git clone https://github.com/MasterYip/NotingDown.git
 ```
 
 2. Install the required packages
