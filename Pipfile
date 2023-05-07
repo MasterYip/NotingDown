@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "==1.23.3"
+opencv-python = "==4.6.0.66"
+pillow = "==9.5.0"
+pyqt5 = "==5.15.7"
+pywin32 = "==306"
+system-hotkey = "==1.0.3"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
+python_full_version = "3.8.5"
