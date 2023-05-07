@@ -25,9 +25,10 @@ system_hotkey==1.0.3
 
 ### Installation Steps
 
-1. Clone the repository
+1. Clone the repository and open it as root directory
 ```bash
 git clone https://github.com/MasterYip/NotingDown.git
+cd ./NotingDown
 ```
 
 2. Install the required packages

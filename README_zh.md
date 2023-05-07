@@ -1,6 +1,5 @@
 ![NotingDownCover](README.assets/NotingDownCover.png)
 
-
 ## 简介
 
 一款截图与文档图像增强软件，旨在提供一种**轻松捕获和增强图像的方式**，适用于课堂、会议和其他场合的笔记记录。软件包括诸如**屏幕截图、图像二值化（可选保留颜色）和透视校正**等功能。软件使用Python编写，使用PyQt5 GUI库，与Windows和Linux操作系统兼容。
@@ -27,9 +26,10 @@ system_hotkey==1.0.3
 
 ### 安装步骤
 
-1. 克隆存储库
+1. 克隆仓库并打开为工作路径
 ```bash
-git clone https://github.com/<username>/<repository>.git
+git clone https://github.com/MasterYip/NotingDown.git
+cd ./NotingDown
 ```
 
 2. 安装所需的软件包
