@@ -104,7 +104,7 @@
       <item>
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>DarkBkg Adaption</string>
+         <string>Bkg Color Adapt</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -117,7 +117,7 @@
       <item>
        <widget class="QCheckBox" name="checkBox_3">
         <property name="statusTip">
-         <string>Adapt dark background images (e.g. blackboard) and convert it to light background</string>
+         <string>Adapt background color. (e.g. blackboard)</string>
         </property>
         <property name="text">
          <string/>
@@ -358,7 +358,7 @@
       <item>
        <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Color Invertion</string>
+         <string>Inversion Adapt</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -371,7 +371,7 @@
       <item>
        <widget class="QCheckBox" name="checkBox_4">
         <property name="statusTip">
-         <string>Invert screenshot color</string>
+         <string>Adapt color inversion.</string>
         </property>
         <property name="text">
          <string/>
@@ -517,7 +517,7 @@
      <x>0</x>
      <y>0</y>
      <width>644</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -32,6 +32,7 @@ git clone https://github.com/MasterYip/NotingDown.git
 cd ./NotingDown
 ```
 
+
 2. 安装所需的软件包
 ```bash
 pip install -r requirements.txt

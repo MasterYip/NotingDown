@@ -2,7 +2,7 @@
 Author: MasterYip 2205929492@qq.com
 Date: 2023-05-02 22:35:27
 LastEditors: MasterYip 2205929492@qq.com
-LastEditTime: 2023-05-07 11:56:21
+LastEditTime: 2023-06-09 22:19:59
 FilePath: \comprehensive-coding\FastImgNotingDown\main.py
 Description: 
 
@@ -19,6 +19,7 @@ import note_color_threshold as nct
 import cv2
 import numpy as np
 import logging
+import json
 from io import BytesIO
 from hotkeys import HotkeysMgr
 # from system_hotkey import SystemHotkey
@@ -66,6 +67,7 @@ global_logger.addHandler(cil_handler)
 
 class MyWindow(QMainWindow, Ui_MainWindow):
     textColors = ['FF5C5C','398AD9','5BEC8D','FD42AC','FF33FF','4B8200','DE87B8']
+    settings_dir = os.path.join(ROOT_DIR,"settings.json")
     sigkeyhot = Signal(str)
     
     def __init__(self, parent=None):
@@ -80,8 +82,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.bias = 40
         self.mode = 0
         self.auto_warp=False
-        self.Black_board = False
-        self.screenshot.invert_color = False
+        self.bkgcolor_adapt = False
+        self.screenshot.inverse_color = False
         
          # Hot key
         self.sigkeyhot.connect(self.hotkey_press_event)
@@ -89,6 +91,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.hotkey_preset_dict = {"clipboard_img_process":('control','alt','c'),
                                    "folder_img_process":('control','alt','f'),
                                    "capture_hotkey":('alt','q')}
+        self.setting_load()
         # UI
         self._minimize_action = QAction()
         self._maximize_action = QAction()
@@ -160,14 +163,62 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.bias = self.spinBox_3.value()
         self.mode = self.checkBox_1.isChecked()
         self.auto_warp= self.checkBox_2.isChecked()
-        self.Black_board = self.checkBox_3.isChecked()
-        self.screenshot.invert_color = self.checkBox_4.isChecked()
+        self.bkgcolor_adapt = self.checkBox_3.isChecked()
+        self.screenshot.inverse_color = self.checkBox_4.isChecked()
         # Hotkey
         print(self.hotkey_preset_dict)
         self.hotkeymgr.set_hotkey("clipboard_img_process",self.hotkey_preset_dict["clipboard_img_process"])
         self.hotkeymgr.set_hotkey("folder_img_process",self.hotkey_preset_dict["folder_img_process"])
         self.hotkeymgr.set_hotkey("capture_hotkey",self.hotkey_preset_dict["capture_hotkey"])
-  
+        
+        # Save to file
+        settings = []
+        
+        settings.append(self.Folder_dir)
+        settings.append(self.Thresh_dia)
+        settings.append(self.di_rad)
+        settings.append(self.bias)
+        settings.append(self.mode)
+        settings.append(self.auto_warp)
+        settings.append(self.bkgcolor_adapt)
+        settings.append(self.screenshot.inverse_color)
+        settings.append(self.hotkey_preset_dict["clipboard_img_process"])
+        settings.append(self.hotkey_preset_dict["folder_img_process"])
+        settings.append(self.hotkey_preset_dict["capture_hotkey"])
+        with open(self.settings_dir, 'w', encoding='utf8') as fp:
+            json.dump(settings, fp, indent=4,
+                      sort_keys=True, ensure_ascii=False)
+    
+    def setting_load(self):
+        if not os.path.exists(self.settings_dir):
+            return
+        with open(self.settings_dir, 'r', encoding='utf8') as fp:
+            settings = json.load(fp)
+        self.Folder_dir = settings.pop(0)
+        self.lineEdit_1.setText(self.Folder_dir)
+        self.Thresh_dia = settings.pop(0)
+        self.spinBox_1.setValue(self.Thresh_dia)
+        self.di_rad = settings.pop(0)
+        self.spinBox_2.setValue(self.di_rad)
+        self.bias = settings.pop(0)
+        self.spinBox_3.setValue(self.bias)
+        self.mode = settings.pop(0)
+        self.checkBox_1.setChecked(self.mode)
+        self.auto_warp = settings.pop(0)
+        self.checkBox_2.setChecked(self.auto_warp)
+        self.bkgcolor_adapt = settings.pop(0)
+        self.checkBox_3.setChecked(self.bkgcolor_adapt)
+        self.screenshot.inverse_color = settings.pop(0)
+        self.checkBox_4.setChecked(self.screenshot.inverse_color)
+        # Hotkey
+        self.hotkey_preset_dict["clipboard_img_process"] = tuple(settings.pop(0))
+        self.hotkey_preset_dict["folder_img_process"] = tuple(settings.pop(0))
+        self.hotkey_preset_dict["capture_hotkey"] = tuple(settings.pop(0))
+        print(self.hotkey_preset_dict)
+        self.hotkeymgr.set_hotkey("clipboard_img_process",self.hotkey_preset_dict["clipboard_img_process"])
+        self.hotkeymgr.set_hotkey("folder_img_process",self.hotkey_preset_dict["folder_img_process"])
+        self.hotkeymgr.set_hotkey("capture_hotkey",self.hotkey_preset_dict["capture_hotkey"])
+    
     def create_actions(self):
         self._minimize_action = QAction("Minimize", self)
         self._minimize_action.triggered.connect(self.hide)
@@ -223,13 +274,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             event.ignore()
     
     def folder_img_process(self):
-        self.Folder_dir = self.lineEdit_1.text()
-        self.Thresh_dia = self.spinBox_1.value()
-        self.di_rad = self.spinBox_2.value()
-        self.bias = self.spinBox_3.value()
-        self.mode = self.checkBox_1.isChecked()
-        self.auto_warp= self.checkBox_2.isChecked()
-        self.Black_board = self.checkBox_3.isChecked()
+        self.setting_save()
         
         # print(glob.glob(dir+'\\**\\*.jpg',recursive=True)) #全部搜索
         #注意 Linux为// Win为\\
@@ -243,12 +288,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 # img = cv2.imread(file_dir)
                 img = cv2.imdecode(np.fromfile(file_dir,dtype=np.uint8),-1) #可读取中文路径
                 img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+                # Background adaption - inversion check
+                inverse = False
+                if self.bkgcolor_adapt:
+                    inverse = nct.imgInversionCheck(img)
                 if self.auto_warp: 
                     BR = nct.BlackboardRecorder(img)
-                    if self.Black_board: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh_ivt)
+                    if inverse: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh_ivt)
                     else: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh)
                     img = BR.homography_projection(BR.img,src_points, dst_points, (dst_img_w, dst_img_h))
-                if self.Black_board:
+                if inverse:
                     thresh = nct.note_color_threshold_for_black_bkg(img,dilate_rad=self.di_rad,Thresh_bias = self.bias,
                                                                     Thresh_dia=self.Thresh_dia,mode=self.mode)
                 else: 
@@ -297,28 +346,36 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def clipboard_img_process(self):
         # TODO:compress img to shrink size(save to tmp folder and copy from folder)
         self.set_icon("icon_b")
-        img = self.grab_img_cv2()
-        if not img is None:
-            # No need to convert when read from clipboard
-            # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-            if self.auto_warp:
-                try:
-                    BR = nct.BlackboardRecorder(img)
-                    if self.Black_board: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh_ivt)
-                    else: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh)
-                    img = BR.homography_projection(BR.img,src_points, dst_points, (dst_img_w, dst_img_h))
-                except:
-                    global_logger.warning("Searching ROI failed, cancelling homography projection.")
-            if self.Black_board:
-                thresh = nct.note_color_threshold_for_black_bkg(img,dilate_rad=self.di_rad,Thresh_bias = self.bias,
-                                                                Thresh_dia=self.Thresh_dia,mode=self.mode)
-            else: 
-                thresh = nct.note_color_threshold_for_white_bkg(img,dilate_rad=self.di_rad,Thresh_bias = self.bias,
-                                                    Thresh_dia=self.Thresh_dia,mode=self.mode)
-            self.paste_img_cv2(thresh)
-        else:
-            global_logger.info("No Img in clipboard.")
+        try:
+            img = self.grab_img_cv2()
+            # Background adaption - inversion check
+            inverse = False
+            if self.bkgcolor_adapt:
+                inverse = nct.imgInversionCheck(img)
+            if not img is None:
+                # No need to convert when read from clipboard
+                # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+                if self.auto_warp:
+                    try:
+                        BR = nct.BlackboardRecorder(img)
+                        if inverse: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh_ivt)
+                        else: src_points, dst_points, (dst_img_w, dst_img_h) = BR.find_possible_ROIs(BR.thresh)
+                        img = BR.homography_projection(BR.img,src_points, dst_points, (dst_img_w, dst_img_h))
+                    except:
+                        global_logger.warning("Searching ROI failed, cancelling homography projection.")
+                if inverse:
+                    thresh = nct.note_color_threshold_for_black_bkg(img,dilate_rad=self.di_rad,Thresh_bias = self.bias,
+                                                                    Thresh_dia=self.Thresh_dia,mode=self.mode)
+                else: 
+                    thresh = nct.note_color_threshold_for_white_bkg(img,dilate_rad=self.di_rad,Thresh_bias = self.bias,
+                                                        Thresh_dia=self.Thresh_dia,mode=self.mode)
+                self.paste_img_cv2(thresh)
+            else:
+                global_logger.info("No Img in clipboard.")
+        except:
+            global_logger.warning("Img Processing failed.")
         self.set_icon("icon")
+            
         
 
 if __name__ == '__main__':
