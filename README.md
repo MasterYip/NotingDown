@@ -10,11 +10,39 @@ A screenshot and document image reinforcement software, designed to provide **an
 - **Image Processing**: users can apply various image processing techniques such as **screen capturing, image binarization(optional color retaining), and perspective correction**, etc.
 - **Hotkeys**: users can use hotkeys to quickly capture a screenshot and start processing the image.
 
+## NotingDown Examples
+
+<div style="display:flex; justify-content:center;">
+    <img src="img/ui.png" alt="Image 0" style="height:250px;">
+</div>
+
+### Blackboard Image Processing
+
+<div style="display:flex; justify-content:center;">
+    <img src="img/blackboard0.png" alt="Image 0" style="height:150px;">
+    <img src="img/blackboard1.png" alt="Image 1" style="height:150px;">
+</div>
+
+### Handwritten Notes Image Processing
+
+<div style="display:flex; justify-content:center;">
+    <img src="img/handwritten0.png" alt="Image 0" style="height:250px;">
+    <img src="img/handwritten1.png" alt="Image 1" style="height:250px;">
+</div>
+
+### PPT Warp Correction
+
+<div style="display:flex; justify-content:center;">
+    <img src="img/warp0.jpg" alt="Image 0" style="height:250px;">
+    <img src="img/warp1.png" alt="Image 1" style="height:250px;">
+</div>
+
 ## Installation
 
 ### Requirements
 
 It needs Python 3.8 or higher
+
 ```
 numpy==1.21.5
 opencv_python==4.6.0.66
@@ -26,17 +54,20 @@ system_hotkey==1.0.3
 ### Installation Steps
 
 1. Clone the repository and open it as root directory
+
 ```bash
 git clone https://github.com/MasterYip/NotingDown.git
 cd ./NotingDown
 ```
 
 2. Install the required packages
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. Run the application
+
 ```bash
 python main.py
 ```
